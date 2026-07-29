@@ -1,0 +1,73 @@
+<header class="site-header">
+    <nav class="nav-container">
+        <!-- Puedes añadir un logo opcional aquí -->
+        <div class="logo">
+            
+                <!--<img src="{{ url_for('static', filename='MiLogo.jpg') }}" alt="Mi Logo" class="logo-img"> -->
+            <div class="flex items-center gap-2">
+    <i class="fa-solid fa-film text-2xl text-blue-600 animate-pulse"></i>
+    <span class="text-xl font-bold text-gray-900">CineApp</span>
+</div>
+        </div>
+
+        <!-- Los 3 nav (secciones de navegación) -->
+        <ul class="nav-list">
+            <li class="nav-item"><a href="/" class="nav-link">Inicio</a></li>
+            <li class="nav-item"><a href="/nosotros" class="nav-link">Nosotros</a></li>
+            <li class="nav-item"><a href="/contactanos" class="nav-link">Contacto</a></li>
+        </ul>
+    </nav>
+</header>
+
+<style>
+    /* Estilos del encabezado */
+    .site-header {
+        background-color: #d1d5db; /* Color gris */
+        width: 100%;
+        height: 50px; /* Puedes ajustarlo a un porcentaje de la pantalla si lo prefieres */
+        position: fixed; /* Opcional: para que se quede arriba al hacer scroll */
+        top: 0;
+        left: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .nav-container {
+        width: 90%; /* Ocupa el 90% de la parte superior */
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .logo {
+        display: flex;
+        align-items: center;
+    }
+
+    .logo-img {
+        height: 40px; /* Limita el alto de la imagen para que no rompa la barra */
+        width: auto;  /* Mantiene la proporción original de tu logo */
+        object-fit: contain;
+        display: block;
+    }
+
+    .nav-list {
+        display: flex;
+        list-style: none;
+        gap: 2rem;
+        margin: 0;
+        padding: 0;
+    }
+
+    .nav-link {
+        text-decoration: none;
+        color: #374151; /* Color del texto */
+        font-weight: bold;
+    }
+
+    .nav-link:hover {
+        color: #1f2937;
+    }
+</style>

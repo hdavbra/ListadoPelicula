@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="es">
+{% include 'encabezado.html' %} 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nosotros</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased min-h-screen flex flex-col">
+
+    <main class="flex-grow flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+        
+        <div class="max-w-3xl w-full bg-white p-8 sm:p-10 rounded-xl shadow-sm border border-gray-200">
+            
+            <div class="text-center mb-6">
+                <i class="fa-solid fa-building-columns text-4xl text-blue-600 mb-3"></i>
+                <h2 class="text-3xl font-bold text-gray-900 tracking-tight">Nosotros</h2>
+                <div class="h-1 w-20 bg-blue-600 mx-auto mt-3 rounded-full"></div>
+            </div>
+            
+            <div class="space-y-4 text-justify leading-relaxed text-gray-600">
+                <p> 
+                    El Ministerio del Poder Popular para la Educación Universitaria es uno de los órganos que conforman el gabinete ministerial del Poder Ejecutivo de Venezuela. Encargado de la dirección estratégica de la educación universitaria y ente rector de las instituciones públicas y privadas.
+                </p>
+                <p>
+                    Formula políticas para garantizar el derecho a una educación universitaria pública, gratuita y de calidad que fortalezca el poder popular, promueva la investigación y la innovación a través de la calidad académica, mejore el perfil profesional de los egresados y fomente su vinculación social comunitaria engranada con el desarrollo social y territorial del país.
+                </p>
+            </div>
+
+        </div>
+    </main>
+
+    {% include 'footer.html' %} 
+</body>
+</html>

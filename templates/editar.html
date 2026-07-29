@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Editar Registro</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-50 text-gray-800 font-sans antialiased min-h-screen flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+
+    <div class="max-w-md w-full space-y-8 bg-white p-8 rounded-xl shadow-sm border border-gray-200">
+        
+        <div class="text-center">
+            <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-amber-50 border border-amber-200 text-amber-600 mb-3">
+                <i class="fa-solid fa-pen-to-square text-lg"></i>
+            </div>
+            <h2 class="text-3xl font-bold text-gray-900 tracking-tight">Editar Registro</h2>
+            <p class="text-sm text-gray-500 mt-2">Modifica los campos necesarios para actualizar en MariaDB</p>
+        </div>
+
+        <form method="POST" class="mt-8 space-y-6">
+            
+            <div class="space-y-4 rounded-md shadow-sm">
+                <div>
+                    <label for="nombre" class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+                    <input type="text" id="nombre" name="nombre" value="{{ registro['nombre'] }}" required 
+                        placeholder="Ej. Juan Pérez"
+                        class="appearance-none block w-full px-3 py-2.5 border border-gray-300 rounded-lg placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 sm:text-sm transition-colors duration-200">
+                </div>
+
+                <div>
+                    <label for="valor" class="block text-sm font-medium text-gray-700 mb-1">Valor</label>
+                    <input type="text" id="valor" name="valor" value="{{ registro['valor'] }}" required 
+                        placeholder="Ej. 150.00"
+                        class="appearance-none block w-full px-3 py-2.5 border border-gray-300 rounded-lg placeholder-gray-400 text-gray-900 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 sm:text-sm transition-colors duration-200">
+                </div>
+            </div>
+
+            <div class="flex items-center justify-between gap-4 pt-2">
+                <a href="{{ url_for('index') }}" class="w-1/2 inline-flex items-center justify-center px-4 py-2.5 text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 border border-gray-300 rounded-lg shadow-sm transition-colors duration-200">
+                    <i class="fa-solid fa-xmark mr-2 text-gray-400"></i>
+                    Cancelar
+                </a>
+                
+                <button type="submit" class="w-1/2 inline-flex items-center justify-center px-4 py-2.5 text-sm font-medium text-white bg-amber-600 hover:bg-amber-700 active:bg-amber-800 rounded-lg shadow-sm transition-colors duration-200">
+                    <i class="fa-solid fa-floppy-disk mr-2 text-amber-200"></i>
+                    Guardar
+                </button>
+            </div>
+            
+        </form>
+
+    </div>
+
+</body>
+</html>
