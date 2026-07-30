@@ -17,7 +17,7 @@ def get_db_connection():
         password="Hd4vbr4tqk09MDB",
         host="localhost",
         port=3306,
-        database="testapp"
+        database="listado_pelicula"
     )
 
 # --- READ (Leer) ---
