@@ -14,16 +14,16 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'mi_clave_secreta_super_segura_12345')
 
 # Configuración de conexión dinámica para Render y FreeSQLDatabase
+# Configuración de conexión dinámica para Render y FreeSQLDatabase
 def get_db_connection():
     return pymysql.connect(
-        host=os.environ.get("DB_HOST", "localhost"),
-        user=os.environ.get("DB_USER", "root"),
-        password=os.environ.get("DB_PASSWORD", "Hd4vbr4tqk09MDB"),
-        database=os.environ.get("DB_NAME", "listado_pelicula"),
-        port=int(os.environ.get("DB_PORT", 3306)),
-        autocommit=True # Para que los cambios se apliquen sin necesidad de conn.commit() explícito en cada consulta simple
+        host=os.environ.get("DB_HOST"),
+        user=os.environ.get("DB_USER"),
+        password=os.environ.get("DB_PASSWORD"),
+        database=os.environ.get("DB_NAME"),
+        port=int(os.environ.get("DB_PORT", 3306)), # Mantenemos 3306 por si falta el puerto, ya que es el estándar de MariaDB
+        autocommit=True
     )
-
 # --- READ (Leer) ---
 @app.route('/')
 @app.route('/index')
