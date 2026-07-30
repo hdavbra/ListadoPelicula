@@ -1,67 +1,61 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
-import mariadb
+import os
 import math
+from flask import Flask, render_template, request, redirect, url_for, flash
+import pymysql
+import pymysql.cursors
+from dotenv import load_dotenv
+
+# Cargar variables de entorno desde un archivo .env (solo para desarrollo local)
+load_dotenv()
 
 app = Flask(__name__)
 
-# OBLIGATORIO: Agrega una clave secreta si no la tienes.
-# Flask la necesita para poder manejar las sesiones de los mensajes flash().
-app.config['SECRET_KEY'] = 'mi_clave_secreta_super_segura_12345'
+# Lee la clave secreta desde las variables de entorno de Render, o usa una por defecto local
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'mi_clave_secreta_super_segura_12345')
 
-# Aquí ya debes tener tu configuración de conexión actual, algo similar a esto:
-
-# Configuración de conexión a MariaDB
+# Configuración de conexión dinámica para Render y FreeSQLDatabase
 def get_db_connection():
-    return mariadb.connect(
-        user="root",
-        password="Hd4vbr4tqk09MDB",
-        host="localhost",
-        port=3306,
-        database="listado_pelicula"
+    return pymysql.connect(
+        host=os.environ.get("DB_HOST", "localhost"),
+        user=os.environ.get("DB_USER", "root"),
+        password=os.environ.get("DB_PASSWORD", "Hd4vbr4tqk09MDB"),
+        database=os.environ.get("DB_NAME", "listado_pelicula"),
+        port=int(os.environ.get("DB_PORT", 3306)),
+        autocommit=True # Para que los cambios se apliquen sin necesidad de conn.commit() explícito en cada consulta simple
     )
 
 # --- READ (Leer) ---
 @app.route('/')
 @app.route('/index')
-
-
 def index():
-    # 1. Obtener el número de página actual desde la URL (por defecto es 1)
     page = request.args.get('page', 1, type=int)
-    
-    # Definir el límite de registros por página
     REGISTROS_POR_PAGINA = 6
-    
-    # 2. Calcular el desplazamiento (OFFSET) para la consulta SQL
     offset = (page - 1) * REGISTROS_POR_PAGINA
+    
     conn = get_db_connection()
-    cursor = conn.cursor(dictionary=True)
+    # Usamos DictCursor para mantener la compatibilidad con tu código estructurado como diccionario
+    cursor = conn.cursor(pymysql.cursors.DictCursor)
    
     try:
-        # 3. Obtener el número total de registros en la tabla para calcular el total de páginas
         cursor.execute("SELECT COUNT(*) AS total FROM registros")
         total_registros = cursor.fetchone()['total']
         
-        # Calcular el número total de páginas (redondeando hacia arriba)
         total_paginas = math.ceil(total_registros / REGISTROS_POR_PAGINA)
         if total_paginas == 0:
             total_paginas = 1
 
-        # 4. Consultar solo los 6 registros correspondientes a la página actual
-        # Usamos LIMIT para la cantidad y OFFSET para saber desde dónde empezar a leer
         query = "SELECT id, nombre, valor FROM registros LIMIT %s OFFSET %s"
         cursor.execute(query, (REGISTROS_POR_PAGINA, offset))
         registros = cursor.fetchall()
         
     except Exception as e:
-        print(f"Error al consultar MariaDB: {e}")
+        print(f"Error al consultar la Base de Datos: {e}")
         registros = []
         total_paginas = 1
     finally:
         cursor.close()
         conn.close()
 
-    # 5. Enviar las variables de paginación al frontend
     return render_template(
         'index.html', 
         registros=registros, 
@@ -78,8 +72,9 @@ def agregar():
 
         conn = get_db_connection()
         cursor = conn.cursor()
-        cursor.execute("INSERT INTO registros (nombre, valor) VALUES (?, ?)", (nombre, valor))
-        conn.commit()
+        # PyMySQL usa %s como marcador de posición en lugar de ?
+        cursor.execute("INSERT INTO registros (nombre, valor) VALUES (%s, %s)", (nombre, valor))
+        cursor.close()
         conn.close()
         return redirect(url_for('index'))
     
@@ -94,26 +89,22 @@ def editar(id):
         nombre = request.form['nombre']
         valor = request.form['valor']
         
-        # 1. Usamos un cursor normal para actualizar
         cursor = conn.cursor()
-        cursor.execute("UPDATE registros SET nombre = ?, valor = ? WHERE id = ?", (nombre, valor, id))
-        conn.commit()
+        # Cambiado ? por %s
+        cursor.execute("UPDATE registros SET nombre = %s, valor = %s WHERE id = %s", (nombre, valor, id))
         cursor.close()
         conn.close()
-        
-        # CRUCIAL: Detener la función aquí y redirigir
         return redirect(url_for('index'))
         
     else:
-        # 2. Si el método es GET, aquí SÍ hacemos la consulta SELECT primero
-        cursor = conn.cursor(dictionary=True)
-        cursor.execute("SELECT * FROM registros WHERE id = ?", (id,)) # <-- ¡Faltaba esto!
+        cursor = conn.cursor(pymysql.cursors.DictCursor)
+        # Cambiado ? por %s
+        cursor.execute("SELECT * FROM registros WHERE id = %s", (id,))
         registro = cursor.fetchone()
         
         cursor.close()
         conn.close()
         
-        # Validamos que el registro realmente exista en la base de datos
         if registro is None:
             return "Registro no encontrado", 404
             
@@ -124,33 +115,24 @@ def editar(id):
 def eliminar(id):
     conn = get_db_connection()
     cursor = conn.cursor()
-    cursor.execute("DELETE FROM registros WHERE id = ?", (id,))
-    conn.commit()
+    # Cambiado ? por %s
+    cursor.execute("DELETE FROM registros WHERE id = %s", (id,))
+    cursor.close()
     conn.close()
     return redirect(url_for('index'))
 
-# AGREGA ESTA RUTA PARA "NOSOTROS"
 @app.route('/nosotros')
 def nosotros():
-    # 'nosotros.html' debe ser el nombre exacto de tu archivo dentro de /templates
     return render_template('nosotros.html')
 
 @app.route('/contactanos')
 def contactanos():
-    # 'nosotros.html' debe ser el nombre exacto de tu archivo dentro de /templates
     return render_template('contactanos.html')
 
-# RUTA PRINCIPAL (Donde muestras el formulario)
-#@app.route('/contact')
-#def contac():
- #   return render_template('contactanos.html')
-
-
-# NUEVA RUTA: AGREGAR ESTO PARA GUARDAR LOS DATOS DE CONTACTO
+# NUEVA RUTA: GUARDAR LOS DATOS DE CONTACTO
 @app.route('/guardar', methods=['POST'])
 def guardar():
     if request.method == 'POST':
-        # 1. Capturar los datos enviados desde el formulario HTML
         nombre = request.form['nombre']
         apellido = request.form['apellido']
         correo = request.form['correo']
@@ -159,38 +141,28 @@ def guardar():
         
         conn = None
         try:
-            # 2. Conectarse a la base de datos a través de tu método existente
             conn = get_db_connection()
             cursor = conn.cursor()
             
-            # 3. Sentencia SQL con marcadores de posición (?) para evitar inyecciones SQL
+            # Cambiados los ? por %s para compatibilidad con PyMySQL
             sql = """
                 INSERT INTO contactos (nombre, apellido, correo, telefono, mensaje) 
-                VALUES (?, ?, ?, ?, ?)
+                VALUES (%s, %s, %s, %s, %s)
             """
             valores = (nombre, apellido, correo, telefono, mensaje)
             
-            # 4. Ejecutar y guardar los cambios
             cursor.execute(sql, valores)
-            conn.commit()
-            
-            # 5. Definir el mensaje de éxito requerido
             flash('Registro guardado exitosamente, próximamente te contactaremos', 'success')
             
-        except mariadb.Error as e:
-            if conn:
-                conn.rollback()  # Deshacer cambios si algo falla
+        except Exception as e:
             flash(f'Hubo un error al guardar tus datos: {e}', 'error')
             
         finally:
-            # 6. Asegurar el cierre del cursor y la conexión siempre
             if conn:
                 cursor.close()
                 conn.close()
                 
-        # 7. Redireccionar de vuelta al formulario limpio
         return redirect(url_for('contactanos'))
 
 if __name__ == '__main__':
     app.run(debug=True)
-
